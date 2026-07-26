@@ -1,10 +1,20 @@
-#!name=百度网盘去广告（小火箭版）
-#!desc=移除百度网盘首页中的小说、短剧、打印、求职推广入口。由 Kelee Loon LPX 转换。
+#!name=百度网盘去广告（小火箭完整版）
+#!desc=移除开屏广告、首页卡片广告、传输页面广告、活动弹窗，并精简首页推广入口。由 Kelee Loon LPX 转换。
 #!author=OpenAI conversion
 #!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/BaiduNetDisk.png
 
+[URL Rewrite]
+^https:\/\/pan\.baidu\.com\/api\/getconfig\? _ REJECT-DICT
+^https:\/\/pan\.baidu\.com\/api\/getsyscfg\? _ REJECT-DICT
+^https:\/\/pan\.baidu\.com\/api\/taskscore\/tasklist\? _ REJECT-DICT
+^https:\/\/pan\.baidu\.com\/act\/api\/activityentry\? _ REJECT-DICT
+^https:\/\/pan\.baidu\.com\/rest\/\d\.\d\/pcs\/adv\? _ REJECT-DICT
+^https:\/\/pan\.baidu\.com\/api\/plugin\/get\? _ REJECT-DICT
+^https:\/\/pan\.baidu\.com\/recommend\/query\/list\? _ REJECT-DICT
+
 [Script]
-百度网盘首页入口净化 = type=http-response, pattern=^https:\/\/pan\.baidu\.com\/feed\/kingkongdistrict\?, requires-body=1, max-size=0, timeout=10, script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/shadowrocket/BaiduNetDisk_remove_ads.js
+百度网盘首页入口净化 = type=http-response,pattern=^https:\/\/pan\.baidu\.com\/feed\/kingkongdistrict\?,requires-body=1,max-size=0,timeout=10,script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/shadowrocket/BaiduNetDisk_remove_ads.js,script-update-interval=0
 
 [MITM]
 hostname = %APPEND% pan.baidu.com
+h2 = true
