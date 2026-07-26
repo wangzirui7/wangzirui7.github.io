@@ -1,0 +1,10 @@
+#!name=百度网盘去广告（小火箭版）
+#!desc=移除百度网盘首页中的小说、短剧、打印、求职推广入口。由 Kelee Loon LPX 转换。
+#!author=OpenAI conversion
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/BaiduNetDisk.png
+
+[Script]
+百度网盘首页入口净化 = type=http-response, pattern=^https:\/\/pan\.baidu\.com\/feed\/kingkongdistrict\?, requires-body=1, max-size=0, timeout=10, script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/shadowrocket/BaiduNetDisk_remove_ads.js
+
+[MITM]
+hostname = %APPEND% pan.baidu.com
