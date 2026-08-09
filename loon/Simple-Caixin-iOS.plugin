@@ -1,0 +1,20 @@
+#!name = 极简财新（iOS App）
+#!desc = 精简财新 App 文章页；不修改正文、订阅或付费内容
+#!author = wangzirui7
+#!homepage = https://github.com/wangzirui7/wangzirui7.github.io/tree/main/loon
+#!system = iOS,iPadOS
+#!tag = 阅读,工具
+#!type = normal
+
+[Argument]
+hideAudio = switch,true,tag=隐藏文章音频,desc=默认开启；正文页右下角也可临时切换
+hideComments = switch,false,tag=隐藏评论,desc=隐藏 App 原生评论列表
+hideRelated = switch,false,tag=隐藏相关推荐,desc=隐藏正文末尾相关推荐
+
+[Script]
+http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.html(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新正文,argument=[{hideAudio},{hideComments},{hideRelated}]
+http-response ^https?:\/\/mapiv5\.caixin\.com\/ios\/article\/getArticleComments(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新评论,argument=[{hideAudio},{hideComments},{hideRelated}]
+http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.json(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新相关推荐,argument=[{hideAudio},{hideComments},{hideRelated}]
+
+[Mitm]
+hostname = mappsv5.caixin.com, mapiv5.caixin.com
