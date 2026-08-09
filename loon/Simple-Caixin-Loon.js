@@ -30,6 +30,13 @@
   var body = (typeof $response !== 'undefined' && typeof $response.body === 'string') ? $response.body : '';
 
   function boolArgument(name, fallback) {
+    if (typeof $argument === 'object' && $argument !== null &&
+        Object.prototype.hasOwnProperty.call($argument, name)) {
+      var objectValue = $argument[name];
+      if (typeof objectValue === 'boolean') return objectValue;
+      return !/^(false|0|no|off)$/i.test(String(objectValue));
+    }
+
     var source = typeof $argument === 'string' ? $argument : '';
     var escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     var match = new RegExp('(?:^|[,&\\s])' + escapedName + '=([^,&\\s]+)', 'i').exec(source);
