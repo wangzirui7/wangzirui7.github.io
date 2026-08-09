@@ -1,21 +1,33 @@
 #!name=极简财新 · Loon iOS
-#!desc=保留 Simple-Caixin 的去水印、去干扰元素、响应式排版、语音/评论开关，并适配财新 iOS App WebView。不会修改会员、正文授权或付费校验。
+#!desc=保留 Simple-Caixin 阅读净化与排版功能，适配财新 iOS/iPadOS WebView；支持可逆语音/评论/相关推荐/水印开关，不修改正文授权、会员或付费校验。
 #!author=wangzirui7
 #!homepage=https://github.com/wangzirui7/wangzirui7.github.io/tree/main/loon
 #!system=iOS,iPadOS
 #!loon_version=3.2.1(733)
 #!tag=财新,阅读,去广告
 
-[URL Rewrite]
-# HAR 中确认的财新广告位接口；只拦广告请求，不处理正文/授权接口。
-^https?:\/\/(?:gg|dolphin)\.caixin\.com\/s(?:\?|$) reject-200
+[Argument]
+cleanLayout = switch,true,tag=极简排版,desc=保留原脚本的导航、侧栏、分享、热词、网站地图、题图图注等阅读净化与排版调整
+hideAiVoice = switch,true,tag=隐藏语音,desc=只隐藏语音界面，不删除音频地址；文章内可随时恢复
+hideComment = switch,false,tag=隐藏评论,desc=网页评论即时隐藏；App 原生评论接口在下次加载时生效
+hideRelated = switch,false,tag=隐藏相关推荐,desc=隐藏正文相关推荐；App 原生推荐接口在下次加载时生效
+hideWatermark = switch,true,tag=隐藏水印,desc=移除网页与 App WebView 已知背景/用户水印容器
+showPanel = switch,true,tag=显示页面设置,desc=在文章页显示适配触屏的设置按钮
+blockAds = switch,true,tag=拦截广告接口,desc=拦截 HAR 中确认的 gg.caixin.com 与 dolphin.caixin.com 广告位请求
 
 [Script]
-# 设置面板 -> Loon 持久化配置桥
-http-request ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/__simple_caixin_config(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,tag=极简财新设置同步,enable=true
+# 页面内设置同步到 Loon persistentStore
+http-request ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/__simple_caixin_config(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,tag=极简财新设置同步,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
 
-# 全站网页 + iOS App WebView；脚本内部仅处理 HTML、评论和语音接口，其余响应原样放行。
-http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/.* script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新,enable=true
+# 仅拦 HAR 中确认的广告位；关闭 blockAds 后完全放行
+http-request ^https?:\/\/(?:gg|dolphin)\.caixin\.com\/s(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,tag=财新广告位,enable={blockAds},argument=[{blockAds}]
 
-[MITM]
+# 原生评论与相关推荐；关闭对应开关时脚本返回原始响应
+http-response ^https?:\/\/mapiv5\.caixin\.com\/ios\/article\/getArticleComments(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新评论,enable=true,argument=[{hideComment}]
+http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.json(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新相关推荐,enable=true,argument=[{hideRelated}]
+
+# 财新文章 HTML（含 iOS App WebView 与桌面网页）
+http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/.*\.html(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新文章,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
+
+[Mitm]
 hostname = *.caixin.com
