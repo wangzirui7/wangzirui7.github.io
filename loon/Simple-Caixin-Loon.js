@@ -1,9 +1,10 @@
 /**
- * Simple-Caixin for Loon / iOS v4.1
+ * Simple-Caixin for Loon / iOS v4.2
  * Based on Simple-Caixin (MPL-2.0) by EAK8T6Z / plasma-blue.
  *
- * v4.1 keeps v4's canvas/Shadow DOM support but removes the broad visual
- * overlay heuristic that could hide the entire Caixin article container.
+ * v4.2 preserves the Caixin App content mount root (#cx-customer).
+ * Only explicit watermark nodes, short watermark text, pseudo-elements,
+ * Shadow DOM and canvas watermark text are suppressed.
  */
 (function () {
   'use strict';
@@ -164,7 +165,7 @@ html.simple-caixin-clean-layout #cx-cons table,html.simple-caixin-clean-layout .
 html.simple-caixin-hide-voice #cx-audio,html.simple-caixin-hide-voice .pc-aivoice,html.simple-caixin-hide-voice .pc-aivoice.trial,html.simple-caixin-hide-voice .vioce-box-cons{display:none!important}
 html.simple-caixin-hide-comment #cx-comment,html.simple-caixin-hide-comment .pc-comment,html.simple-caixin-hide-comment .comment,html.simple-caixin-hide-comment [class*="cx-comment"]{display:none!important}
 html.simple-caixin-hide-related #cx-promote,html.simple-caixin-hide-related #cx-promotes,html.simple-caixin-hide-related .cx-promote,html.simple-caixin-hide-related .cx-promotes,html.simple-caixin-hide-related .related-article,html.simple-caixin-hide-related .relatarticle{display:none!important}
-html.simple-caixin-hide-watermark #cx-customer,html.simple-caixin-hide-watermark #cx-customer *,html.simple-caixin-hide-watermark .watermark,html.simple-caixin-hide-watermark .water-mark,html.simple-caixin-hide-watermark .cx-watermark,html.simple-caixin-hide-watermark .cx-water-mark,html.simple-caixin-hide-watermark .shuiyin,html.simple-caixin-hide-watermark .cx-shuiyin,html.simple-caixin-hide-watermark [id*="watermark"],html.simple-caixin-hide-watermark [class*="watermark"],html.simple-caixin-hide-watermark [id*="water-mark"],html.simple-caixin-hide-watermark [class*="water-mark"],html.simple-caixin-hide-watermark [id*="shuiyin"],html.simple-caixin-hide-watermark [class*="shuiyin"]{display:none!important;visibility:hidden!important;opacity:0!important;background:none!important;background-image:none!important}
+html.simple-caixin-hide-watermark .watermark,html.simple-caixin-hide-watermark .water-mark,html.simple-caixin-hide-watermark .cx-watermark,html.simple-caixin-hide-watermark .cx-water-mark,html.simple-caixin-hide-watermark .shuiyin,html.simple-caixin-hide-watermark .cx-shuiyin,html.simple-caixin-hide-watermark [id*="watermark"],html.simple-caixin-hide-watermark [class*="watermark"],html.simple-caixin-hide-watermark [id*="water-mark"],html.simple-caixin-hide-watermark [class*="water-mark"],html.simple-caixin-hide-watermark [id*="shuiyin"],html.simple-caixin-hide-watermark [class*="shuiyin"]{display:none!important;visibility:hidden!important;opacity:0!important;background:none!important;background-image:none!important}
 html.simple-caixin-hide-watermark #cx-customer::before,html.simple-caixin-hide-watermark #cx-customer::after,html.simple-caixin-hide-watermark .watermark::before,html.simple-caixin-hide-watermark .watermark::after,html.simple-caixin-hide-watermark .cx-watermark::before,html.simple-caixin-hide-watermark .cx-watermark::after{content:none!important;display:none!important;background:none!important;background-image:none!important}
 #simple-caixin-loon-panel{position:fixed;top:max(58px,calc(env(safe-area-inset-top) + 8px));right:max(12px,calc(env(safe-area-inset-right) + 8px));z-index:2147483647;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;color:#222;-webkit-tap-highlight-color:transparent;user-select:none}
 #simple-caixin-loon-gear{width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-left:auto;border:0;border-radius:22px;background:rgba(248,248,248,.94);color:#222;box-shadow:0 1px 7px rgba(0,0,0,.2);font-size:19px;line-height:1;cursor:pointer;opacity:.58;touch-action:manipulation}
@@ -179,8 +180,8 @@ html.simple-caixin-hide-watermark #cx-customer::before,html.simple-caixin-hide-w
     var runtime = String.raw`
 (function(){
 'use strict';
-if(window.__SIMPLE_CAIXIN_LOON_V41__)return;
-window.__SIMPLE_CAIXIN_LOON_V41__=true;
+if(window.__SIMPLE_CAIXIN_LOON_V42__)return;
+window.__SIMPLE_CAIXIN_LOON_V42__=true;
 var CONFIG_PATH=${JSON.stringify(CONFIG_PATH)};
 var state=Object.assign({},${initialJson});
 var baseState=Object.assign({},${baseJson});
@@ -189,14 +190,14 @@ var records={watermark:[],voice:[],comment:[],related:[]};
 var shadowRoots=[];var observers=[];var scheduled=false;var panel=null;
 function remember(el,bucket,props){if(!el||!el.style)return;var list=records[bucket];for(var i=0;i<list.length;i++)if(list[i].el===el)return;var old={};props.forEach(function(p){old[p]=[el.style.getPropertyValue(p),el.style.getPropertyPriority(p)]});list.push({el:el,old:old})}
 function setImp(el,p,v){if(!el||!el.style)return;if(el.style.getPropertyValue(p)===v&&el.style.getPropertyPriority(p)==='important')return;el.style.setProperty(p,v,'important')}
-function hideEl(el,bucket){if(!el||!el.style||el.id==='simple-caixin-loon-panel'||(el.closest&&el.closest('#simple-caixin-loon-panel')))return;remember(el,bucket,['display','visibility','opacity','pointer-events']);setImp(el,'display','none');setImp(el,'visibility','hidden');setImp(el,'opacity','0');setImp(el,'pointer-events','none')}
+function hideEl(el,bucket){if(!el||!el.style||el.id==='simple-caixin-loon-panel'||el.id==='cx-customer'||(el.closest&&el.closest('#simple-caixin-loon-panel')))return;remember(el,bucket,['display','visibility','opacity','pointer-events']);setImp(el,'display','none');setImp(el,'visibility','hidden');setImp(el,'opacity','0');setImp(el,'pointer-events','none')}
 function restore(bucket){var list=records[bucket];while(list.length){var r=list.pop();if(!r.el||!r.el.style)continue;Object.keys(r.old).forEach(function(p){var o=r.old[p];if(o[0])r.el.style.setProperty(p,o[0],o[1]||'');else r.el.style.removeProperty(p)})}}
 function roots(){var a=[document];for(var i=0;i<shadowRoots.length;i++)a.push(shadowRoots[i]);try{document.querySelectorAll('*').forEach(function(el){if(el.shadowRoot&&shadowRoots.indexOf(el.shadowRoot)<0)shadowRoots.push(el.shadowRoot)})}catch(_){}return a.concat(shadowRoots.filter(function(r,i,a){return a.indexOf(r)===i}))}
 function deepQuery(selector){var out=[];roots().forEach(function(root){try{root.querySelectorAll(selector).forEach(function(el){if(out.indexOf(el)<0)out.push(el)})}catch(_){}});return out}
 function hideSelector(selector,bucket){deepQuery(selector).forEach(function(el){hideEl(el,bucket)})}
 function watermarkWords(text){text=String(text||'').replace(/\s+/g,'');return /财新网友|版权所有|翻版必究/.test(text)}
-function safeTextWatermark(el){if(!el||!el.tagName||el.id==='simple-caixin-loon-panel'||(el.closest&&el.closest('#simple-caixin-loon-panel')))return false;var txt=String(el.textContent||'').replace(/\s+/g,'');if(!txt||txt.length>120||!watermarkWords(txt))return false;if(el.children&&el.children.length>4)return false;var s;try{s=getComputedStyle(el)}catch(_){return false}var op=parseFloat(s.opacity||'1');var overlay=/^(fixed|absolute|sticky)$/.test(s.position);var rotated=!!(s.transform&&s.transform!=='none');var inert=s.pointerEvents==='none';return overlay||rotated||inert||op<0.82}
-function enforceWatermark(){if(!state.hideWatermark){restore('watermark');return}hideSelector('#cx-customer,#cx-customer *,[id*="watermark"],[class*="watermark"],[id*="water-mark"],[class*="water-mark"],[id*="shuiyin"],[class*="shuiyin"],.watermark,.water-mark,.cx-watermark,.cx-water-mark,.shuiyin,.cx-shuiyin','watermark');deepQuery('body *').forEach(function(el){if(safeTextWatermark(el))hideEl(el,'watermark')})}
+function safeTextWatermark(el){if(!el||!el.tagName||el.id==='simple-caixin-loon-panel'||el.id==='cx-customer'||(el.closest&&el.closest('#simple-caixin-loon-panel')))return false;var txt=String(el.textContent||'').replace(/\s+/g,'');if(!txt||txt.length>120||!watermarkWords(txt))return false;if(el.children&&el.children.length>4)return false;var s;try{s=getComputedStyle(el)}catch(_){return false}var op=parseFloat(s.opacity||'1');var overlay=/^(fixed|absolute|sticky)$/.test(s.position);var rotated=!!(s.transform&&s.transform!=='none');var inert=s.pointerEvents==='none';return overlay||rotated||inert||op<0.82}
+function enforceWatermark(){if(!state.hideWatermark){restore('watermark');return}hideSelector('[id*="watermark"],[class*="watermark"],[id*="water-mark"],[class*="water-mark"],[id*="shuiyin"],[class*="shuiyin"],.watermark,.water-mark,.cx-watermark,.cx-water-mark,.shuiyin,.cx-shuiyin','watermark');deepQuery('body *').forEach(function(el){if(safeTextWatermark(el))hideEl(el,'watermark')})}
 function enforceFeature(on,sel,bucket){if(on)hideSelector(sel,bucket);else restore(bucket)}
 function applyClasses(){var root=document.documentElement;if(!root)return;Object.keys(classMap).forEach(function(k){root.classList.toggle(classMap[k],!!state[k])})}
 function label(name,on){var l={cleanLayout:['极简排版：关闭','极简排版：开启'],hideAiVoice:['语音：显示','语音：隐藏'],hideComment:['评论：显示','评论：隐藏'],hideRelated:['相关推荐：显示','相关推荐：隐藏'],hideWatermark:['水印：显示','水印：隐藏']};return l[name][on?1:0]}
@@ -204,7 +205,7 @@ function labels(){Object.keys(classMap).forEach(function(k){var b=document.query
 function send(values){var q=Object.keys(values).map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(values[k])}).join('&');try{fetch(CONFIG_PATH+'?'+q+'&_='+Date.now(),{method:'GET',cache:'no-store',credentials:'same-origin'}).catch(function(){})}catch(_){}}
 function save(){var v={};Object.keys(classMap).forEach(function(k){v[k]=state[k]?'1':'0'});send(v)}
 function makeButton(name){var b=document.createElement('button');b.type='button';b.className='simple-caixin-loon-btn';b.setAttribute('data-sc-setting',name);b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();state[name]=!state[name];enforce();save()});return b}
-function ensurePanel(){if(!state.showPanel||!document.body)return;panel=document.getElementById('simple-caixin-loon-panel');if(panel)return;panel=document.createElement('div');panel.id='simple-caixin-loon-panel';var g=document.createElement('button');g.id='simple-caixin-loon-gear';g.type='button';g.textContent='⚙️';g.setAttribute('aria-label','极简财新设置');var m=document.createElement('div');m.id='simple-caixin-loon-menu';['cleanLayout','hideAiVoice','hideComment','hideRelated','hideWatermark'].forEach(function(k){m.appendChild(makeButton(k))});var reset=document.createElement('button');reset.type='button';reset.className='simple-caixin-loon-btn';reset.textContent='恢复插件默认';reset.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();state=Object.assign({},baseState);enforce();send({reset:'1'})});m.appendChild(reset);var n=document.createElement('div');n.id='simple-caixin-loon-note';n.textContent='v4.1：已撤销会误删正文的广域覆盖层识别；仅清理明确水印节点、短文本水印、Shadow DOM 与 canvas 水印。';m.appendChild(n);panel.appendChild(g);panel.appendChild(m);document.body.appendChild(panel);g.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();panel.classList.toggle('sc-open')});panel.addEventListener('click',function(e){e.stopPropagation()});document.addEventListener('click',function(){if(panel)panel.classList.remove('sc-open')})}
+function ensurePanel(){if(!state.showPanel||!document.body)return;panel=document.getElementById('simple-caixin-loon-panel');if(panel)return;panel=document.createElement('div');panel.id='simple-caixin-loon-panel';var g=document.createElement('button');g.id='simple-caixin-loon-gear';g.type='button';g.textContent='⚙️';g.setAttribute('aria-label','极简财新设置');var m=document.createElement('div');m.id='simple-caixin-loon-menu';['cleanLayout','hideAiVoice','hideComment','hideRelated','hideWatermark'].forEach(function(k){m.appendChild(makeButton(k))});var reset=document.createElement('button');reset.type='button';reset.className='simple-caixin-loon-btn';reset.textContent='恢复插件默认';reset.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();state=Object.assign({},baseState);enforce();send({reset:'1'})});m.appendChild(reset);var n=document.createElement('div');n.id='simple-caixin-loon-note';n.textContent='v4.2：保护 #cx-customer 内容挂载根节点；仅清除明确水印节点、短水印文本、Shadow DOM 与 canvas 水印。';m.appendChild(n);panel.appendChild(g);panel.appendChild(m);document.body.appendChild(panel);g.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();panel.classList.toggle('sc-open')});panel.addEventListener('click',function(e){e.stopPropagation()});document.addEventListener('click',function(){if(panel)panel.classList.remove('sc-open')})}
 function enforce(){scheduled=false;applyClasses();enforceWatermark();enforceFeature(state.hideAiVoice,'#cx-audio,.pc-aivoice,.pc-aivoice.trial,.vioce-box-cons','voice');enforceFeature(state.hideComment,'#cx-comment,.pc-comment,.comment,[class*="cx-comment"]','comment');enforceFeature(state.hideRelated,'#cx-promote,#cx-promotes,.cx-promote,.cx-promotes,.related-article,.relatarticle','related');ensurePanel();labels()}
 function schedule(){if(scheduled)return;scheduled=true;setTimeout(enforce,30)}
 function observe(root){if(!window.MutationObserver||!root)return;for(var i=0;i<observers.length;i++)if(observers[i].root===root)return;var o=new MutationObserver(schedule);try{o.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});observers.push({root:root,observer:o})}catch(_){}}
@@ -215,12 +216,12 @@ try{patchCanvasProto(window.OffscreenCanvasRenderingContext2D&&OffscreenCanvasRe
 applyClasses();observe(document.documentElement);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',enforce,{once:true});else enforce();var tick=0;var warm=setInterval(function(){enforce();tick++;if(tick>=20)clearInterval(warm)},500);
 })();
 `;
-    return '<!-- simple-caixin-loon-v4.1 -->\n<style id="simple-caixin-loon-v41-style">' + css + '</style>\n<script id="simple-caixin-loon-v41-runtime">' + runtime.replace(/<\/script/gi, '<\\/script') + '</script>';
+    return '<!-- simple-caixin-loon-v4.2 -->\n<style id="simple-caixin-loon-v42-style">' + css + '</style>\n<script id="simple-caixin-loon-v42-runtime">' + runtime.replace(/<\/script/gi, '<\\/script') + '</script>';
   }
 
   function injectHtml(url, body) {
     if (!body || typeof body !== 'string') return null;
-    if (body.indexOf('simple-caixin-loon-v4.1') !== -1) return null;
+    if (body.indexOf('simple-caixin-loon-v4.2') !== -1) return null;
     if (!/<html[\s>]|<head[\s>]|<body[\s>]/i.test(body)) return null;
     var article = isArticleLikeHtml(url, body), state = stateFor(article), baseState = baseStateFor(article);
     var prepared = addHtmlClasses(body, activeClasses(state)), payload = buildInjection(state, baseState);
