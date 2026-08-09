@@ -1,20 +1,21 @@
-#!name = 极简财新（iOS App）
-#!desc = 精简财新 App 文章页；不修改正文、订阅或付费内容
-#!author = wangzirui7
-#!homepage = https://github.com/wangzirui7/wangzirui7.github.io/tree/main/loon
-#!system = iOS,iPadOS
-#!tag = 阅读,工具
-#!type = normal
+#!name=极简财新 · Loon iOS
+#!desc=保留 Simple-Caixin 的去水印、去干扰元素、响应式排版、语音/评论开关，并适配财新 iOS App WebView。不会修改会员、正文授权或付费校验。
+#!author=wangzirui7
+#!homepage=https://github.com/wangzirui7/wangzirui7.github.io/tree/main/loon
+#!system=iOS,iPadOS
+#!loon_version=3.2.1(733)
+#!tag=财新,阅读,去广告
 
-[Argument]
-hideAudio = switch,true,tag=隐藏文章音频,desc=默认开启；正文页右下角也可临时切换
-hideComments = switch,false,tag=隐藏评论,desc=隐藏 App 原生评论列表
-hideRelated = switch,false,tag=隐藏相关推荐,desc=隐藏正文末尾相关推荐
+[URL Rewrite]
+# HAR 中确认的财新广告位接口；只拦广告请求，不处理正文/授权接口。
+^https?:\/\/(?:gg|dolphin)\.caixin\.com\/s(?:\?|$) reject-200
 
 [Script]
-http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.html(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新正文,argument=[{hideAudio},{hideComments},{hideRelated}]
-http-response ^https?:\/\/mapiv5\.caixin\.com\/ios\/article\/getArticleComments(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新评论,argument=[{hideAudio},{hideComments},{hideRelated}]
-http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.json(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新相关推荐,argument=[{hideAudio},{hideComments},{hideRelated}]
+# 设置面板 -> Loon 持久化配置桥
+http-request ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/__simple_caixin_config(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,tag=极简财新设置同步,enable=true
 
-[Mitm]
-hostname = mappsv5.caixin.com, mapiv5.caixin.com
+# 全站网页 + iOS App WebView；脚本内部仅处理 HTML、评论和语音接口，其余响应原样放行。
+http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/.* script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新,enable=true
+
+[MITM]
+hostname = *.caixin.com
