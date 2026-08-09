@@ -26,8 +26,11 @@ http-request ^https?:\/\/(?:gg|dolphin)\.caixin\.com\/s(?:\?|$) script-path=http
 http-response ^https?:\/\/mapiv5\.caixin\.com\/ios\/article\/getArticleComments(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新评论,enable=true,argument=[{hideComment}]
 http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.json(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新相关推荐,enable=true,argument=[{hideRelated}]
 
-# 财新文章 HTML（含 iOS App WebView 与桌面网页）
-http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/.*\.html(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新文章,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
+# 财新 HTML：App WebView、文章页、index/shtml 页面
+http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/.*\.(?:html?|shtml)(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新文章,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
+
+# 财新大量频道/目录使用以 / 结尾的 URL；上游 userscript 为 *.caixin.com/* 全站匹配
+http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/(?:[^?#]*\/)(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新频道页,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
 
 [Mitm]
 hostname = *.caixin.com
