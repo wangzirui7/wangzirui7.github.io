@@ -1,5 +1,5 @@
 #!name=极简财新 · Loon iOS
-#!desc=v4.1：保留 Simple-Caixin 阅读净化与排版；修复 v4 水印识别误隐藏正文，仅精确处理水印节点、Shadow DOM 与 canvas 文本水印，不修改正文授权、会员或付费校验。
+#!desc=v4.2：保留 Simple-Caixin 阅读净化与排版；保护财新 App 正文挂载根节点 #cx-customer，仅精确处理水印节点、Shadow DOM 与 canvas 文本水印，不修改正文授权、会员或付费校验。
 #!author=wangzirui7
 #!homepage=https://github.com/wangzirui7/wangzirui7.github.io/tree/main/loon
 #!system=iOS,iPadOS
@@ -11,26 +11,21 @@ cleanLayout = switch,true,tag=极简排版,desc=保留原脚本的导航、侧�
 hideAiVoice = switch,true,tag=隐藏语音,desc=只隐藏语音界面，不删除音频地址；文章内可随时恢复
 hideComment = switch,false,tag=隐藏评论,desc=网页评论即时隐藏；App 原生评论接口在下次加载时生效
 hideRelated = switch,false,tag=隐藏相关推荐,desc=隐藏正文相关推荐；App 原生推荐接口在下次加载时生效
-hideWatermark = switch,true,tag=隐藏水印,desc=v4.1 仅处理明确水印节点、短文本覆盖层、Shadow DOM 与 canvas 文本水印，避免误伤正文
+hideWatermark = switch,true,tag=隐藏水印,desc=v4.2 保护 #cx-customer 正文挂载根节点，仅处理明确水印节点、短文本覆盖层、Shadow DOM 与 canvas 文本水印
 showPanel = switch,true,tag=显示页面设置,desc=在文章页显示适配触屏的设置按钮
 blockAds = switch,true,tag=拦截广告接口,desc=拦截 HAR 中确认的 gg.caixin.com 与 dolphin.caixin.com 广告位请求
 
 [Script]
-# v4.1 使用固定 commit URL，避免 Loon 命中旧 v4 脚本缓存
-http-request ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/__simple_caixin_config(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/2ac84b474a02d51b555c5f7f4a910d8d23f50bfd/loon/Simple-Caixin-Loon.js,tag=极简财新设置同步,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
+# v4.2 使用固定 commit URL，避免 Loon 命中旧 v4/v4.1 脚本缓存
+http-request ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/__simple_caixin_config(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/a5c6e6ba8f9ac2f38871f62f50495afb241441ac/loon/Simple-Caixin-Loon.js,tag=极简财新设置同步,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
 
-# 仅拦 HAR 中确认的广告位；关闭 blockAds 后完全放行
-http-request ^https?:\/\/(?:gg|dolphin)\.caixin\.com\/s(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/2ac84b474a02d51b555c5f7f4a910d8d23f50bfd/loon/Simple-Caixin-Loon.js,tag=财新广告位,enable={blockAds},argument=[{blockAds}]
+http-request ^https?:\/\/(?:gg|dolphin)\.caixin\.com\/s(?:\?|$) script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/a5c6e6ba8f9ac2f38871f62f50495afb241441ac/loon/Simple-Caixin-Loon.js,tag=财新广告位,enable={blockAds},argument=[{blockAds}]
 
-# 原生评论与相关推荐；关闭对应开关时脚本返回原始响应
-http-response ^https?:\/\/mapiv5\.caixin\.com\/ios\/article\/getArticleComments(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/2ac84b474a02d51b555c5f7f4a910d8d23f50bfd/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新评论,enable=true,argument=[{hideComment}]
-http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.json(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/2ac84b474a02d51b555c5f7f4a910d8d23f50bfd/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新相关推荐,enable=true,argument=[{hideRelated}]
+http-response ^https?:\/\/mapiv5\.caixin\.com\/ios\/article\/getArticleComments(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/a5c6e6ba8f9ac2f38871f62f50495afb241441ac/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新评论,enable=true,argument=[{hideComment}]
+http-response ^https?:\/\/mappsv5\.caixin\.com\/articlev5\/[^\/]+\/[^\/]+\.json(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/a5c6e6ba8f9ac2f38871f62f50495afb241441ac/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=财新相关推荐,enable=true,argument=[{hideRelated}]
 
-# 财新 HTML：App WebView、文章页、index/shtml 页面
-http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/.*\.(?:html?|shtml)(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/2ac84b474a02d51b555c5f7f4a910d8d23f50bfd/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新文章,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
-
-# 财新大量频道/目录使用以 / 结尾的 URL；上游 userscript 为 *.caixin.com/* 全站匹配
-http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/(?:[^?#]*\/)(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/2ac84b474a02d51b555c5f7f4a910d8d23f50bfd/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新频道页,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
+http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/.*\.(?:html?|shtml)(?:\?.*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/a5c6e6ba8f9ac2f38871f62f50495afb241441ac/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新文章,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
+http-response ^https?:\/\/(?:[^\/]+\.)?caixin\.com\/(?:[^?#]*\/)(?:\?[^#]*)?$ script-path=https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/a5c6e6ba8f9ac2f38871f62f50495afb241441ac/loon/Simple-Caixin-Loon.js,requires-body=true,timeout=10,tag=极简财新频道页,enable=true,argument=[{cleanLayout},{hideAiVoice},{hideComment},{hideRelated},{hideWatermark},{showPanel}]
 
 [Mitm]
 hostname = *.caixin.com
