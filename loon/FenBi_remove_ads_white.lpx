@@ -1,0 +1,52 @@
+#!name = 粉笔去广告（白色占位）
+#!desc = 过滤粉笔广告，首页 Banner 显示纯白占位图
+#!openUrl = https://apps.apple.com/app/id584660358
+#!author = 可莉🅥[https://github.com/luestr/ProxyResource/blob/main/README.md] | 修改：WangZiRui
+#!tag = 去广告
+#!system = 
+#!system_version = 
+#!loon_version = 3.3.7(921)
+#!homepage = https://github.com/wangzirui7/wangzirui7.github.io/tree/main/loon
+#!icon = https://raw.githubusercontent.com/sooyaaabo/Loon/main/Icon/App-Icon/Fenbi.png
+#!date = 2026-08-14
+
+# 2025-11-27 20:44:18
+# https://kelee.one/Tool/Loon/Lpx/FenBi_remove_ads.lpx
+
+[Rewrite]
+# 开屏广告、弹窗广告、悬浮广告、热门搜索、底栏皮肤、我的页面、AI
+^https:\/\/keapi\.fenbi\.com\/app\/(?:iphone|ipad)\/position_resource\/get_banners\? reject-dict
+
+^https:\/\/market-api\.fenbi\.com\/(?:iphone|ipad)\/v1\/assistant\/info\? reject-dict
+
+^https:\/\/keapi\.fenbi\.com\/app\/(?:iphone|ipad)\/position_resource\/get_home_banners\?.*position_resource_type=1 mock-response-body data-type=json data="{"code":1,"msg":"","data":{"positionResourceType":1,"payload":{"items":[{"id":17868,"courseSetId":2,"content":"白色占位","imageUrl":"https://raw.githubusercontent.com/wangzirui7/wangzirui7.github.io/main/loon/FenBi_white_banner.png","url":"null","redirectType":1,"ordinal":8,"createdTime":1746799144383,"startTime":1759850171000,"endTime":4070880000000,"type":0,"bizType":4}],"count":1}}}" status-code=200
+
+^https:\/\/keapi\.fenbi\.com\/app\/(?:iphone|ipad)\/position_resource\/get_home_banners\?.*position_resource_type=2 reject-dict
+
+^https:\/\/keapi\.fenbi\.com\/app\/(?:iphone|ipad)\/\w+\/reddot\? reject-dict
+
+^https:\/\/ke\.fenbi\.com\/(?:iphone|ipad)\/v3\/timetable\/today_with_public_episodes\? reject-dict
+
+^https:\/\/hera-webapp\.fenbi\.com\/(?:iphone|ipad)\/topic\/hotquery\/list\? reject-dict
+
+^https:\/\/hera-webapp\.fenbi\.com\/(?:iphone|ipad)\/explore\/consts\? reject-dict
+
+^https:\/\/hera-webapp\.fenbi\.com\/(?:iphone|ipad)\/recommend\/info\? response-body-json-del data.rollingBanner
+
+^https:\/\/hera-webapp\.fenbi\.com\/(?:iphone|ipad)\/announcement\/hotquery\/list\? reject-dict
+
+^https:\/\/ke\.fenbi\.com\/(?:iphone|ipad)\/v3\/apps\/config\? response-body-json-del data.bottomIconInfos.position.iconDefaultUrl data.bottomIconInfos.position.iconSelectedUrl data.bottomIconInfos.position.nightModeIconDefaultUrl data.bottomIconInfos.position.nightModeIconSelectedUrl
+
+^https:\/\/ke\.fenbi\.com\/(?:iphone|ipad)\/v3\/user_member\/entry\? reject-dict
+^https:\/\/market-api\.fenbi\.com\/(?:iphone|ipad)\/v1\/assistant\/my\? reject-dict
+
+^https:\/\/ke\.fenbi\.com\/(?:iphone|ipad)\/v3\/remind\/instant\? reject-dict
+
+^https:\/\/keapi\.fenbi\.com\/ai\/(?:iphone|ipad)\/exercise_remark\/get_questions_remark\? reject-dict
+
+^https:\/\/keapi\.fenbi\.com\/app\/(?:iphone|ipad)\/position_resource\/get_tiku_banners\? reject-dict
+
+^https:\/\/keapi\.fenbi\.com\/ai\/(?:iphone|ipad)\/entry\? mock-response-body data-type=json data="{"msg":"","data":null,"code":404}"
+
+[MitM]
+hostname = keapi.fenbi.com, market-api.fenbi.com, ke.fenbi.com, hera-webapp.fenbi.com
